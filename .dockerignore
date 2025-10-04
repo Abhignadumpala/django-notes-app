@@ -1,0 +1,28 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+venv/
+env/
+
+# Ignore MySQL database files (to avoid Docker build permission issues)
+data/mysql/db/
+
+# Ignore Git and metadata
+.git/
+.gitignore
+
+# Ignore logs and system files
+*.log
+*.swp
+.DS_Store
+
+# Ignore sensitive files
+*.pem
+*.cnf
+*.ibd
+*.dblwr
+
