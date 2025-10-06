@@ -1,29 +1,70 @@
-@Library('Shared')_
-pipeline{
-    agent { label 'dev-server'}
+@Library('shared') _
+pipeline {
     
-    stages{
-        stage("Code clone"){
-            steps{
-                sh "whoami"
-            clone("https://github.com/LondheShubham153/django-notes-app.git","main")
+    agent { label "vinod" }
+
+    options {
+        // Keep only the last 5 builds to save space
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        // Timestamps in console logs
+        timestamps()
+    }
+
+    stages {
+
+        // Clean workspace before starting
+        stage('Cleanup Workspace') {
+            steps {
+                echo "Cleaning workspace..."
+                deleteDir()  // Deletes all files in the workspace
             }
         }
-        stage("Code Build"){
-            steps{
-            dockerbuild("notes-app","latest")
+
+        stage('Hello') {
+            steps {
+                script {
+                    hello()
+                }
             }
         }
-        stage("Push to DockerHub"){
-            steps{
-                dockerpush("dockerHubCreds","notes-app","latest")
+
+        stage('Code') {
+            steps {
+                script {
+                    clone("https://github.com/Abhignadumpala/django-notes-app.git", "main")
+                }
             }
         }
-        stage("Deploy"){
-            steps{
-                deploy()
+
+        stage('Build') {
+            steps {
+                script {
+                    docker_build("notes-app", "latest", "abhignadumpala1")
+                }
             }
         }
-        
+
+        stage('Push to DockerHub') {
+            steps {
+                script {
+                    docker_push("notes-app", "latest", "abhignadumpala1")
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying the code..."
+                sh "docker compose up -d"
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Cleaning workspace after build..."
+            deleteDir()  // Optional: keeps agent node tidy
+        }
     }
 }
+
