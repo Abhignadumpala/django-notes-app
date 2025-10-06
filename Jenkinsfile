@@ -62,9 +62,8 @@ pipeline {
 
     post {
         always {
-            echo "Cleaning workspace after build..."
-            deleteDir()  // Optional: keeps agent node tidy
+            echo "Cleaning workspace (excluding database volume)..."
+        sh 'sudo rm -rf * || true'
         }
     }
 }
-
